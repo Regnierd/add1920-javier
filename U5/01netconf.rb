@@ -1,8 +1,9 @@
 def menu
-  option = print("Elige una opción para cambiar la configuración de red: \n
-          1: Classroom 109 \n
-          2: My Home \n
-          3: reset \n")
+  print("
+          Elige una opción para cambiar la configuración de red:
+          1: Classroom 109
+          2: My Home
+          3: reset")
 
   option = gets.chomp
 
@@ -23,14 +24,15 @@ end
 def reset
   system("ifdown eth0")
   system("ifup eth0")
-
+  systm("ip a | grep 'inet ' | grep -v 'host lo'")
 end
 
 def classroom109_configutarion
   system("ip addr add 172.19.13.31/16 dev eth0")
-
+  systm("ip a | grep 'inet ' | grep -v 'host lo'")
 end
 
 def myhome_configuration
   system("ip addr add 192.168.13.42/24 dev eth0")
+  systm("ip a | grep 'inet ' | grep -v 'host lo'")
 end
