@@ -2,18 +2,20 @@
 system("clear")
 def menu
   puts "Elige una opción para cambiar la configuración de red:"
-  puts "  1: Classroom 109"
-  puts "  2: My Home"
+  puts "  1: Change Classroom 109"
+  puts "  2: Change My Home"
   puts "  r: reset"
   option = gets.chop
   if option == '1'
-      classroom109_configutarion
+      change_file_classroom
   elsif option == '2'
-      myhome_configuration
+      change_file_home
+  elsif option == '3'
+      change_file
   elsif option == 'r'
     reset    
   else
-    print("Error. Introduce un número o letra (1 y 2 o r).")
+    print("Error. Introduce un número o letra: 1 o 2 o r).")
   end
 end
 def get_network_information
@@ -41,19 +43,18 @@ def display_network_information
   puts "  Internet : #{data[:internet]}"
   puts "  DNS      : #{data[:dns]}"
 end
+def change_file_classroom
+  system("sudo cp /home/javier/Documentos/ejercicios_ruby/add1920-javier-master/U5/classroom /etc/sysconfig/network/ifcfg-eth0")
+  reset
+  display_network_information
+end
+def change_file_home
+  system("sudo cp /home/javier/Documentos/ejercicios_ruby/add1920-javier-master/U5/home /etc/sysconfig/network/ifcfg-eth0")
+  reset
+  display_network_information
+end
 def reset
   system("sudo ifdown eth0")
   system("sudo ifup eth0")
 end
-def classroom109_configutarion
-  data = get_network_information
-  system("sudo ip addr add 172.19.13.32/16 dev eth0")
-  system("sudo ip addr del #{data[:ip]} dev eth0")
-end
-def myhome_configuration
-  data = get_network_information
-  system("sudo ip addr add 192.168.13.42/24 dev eth0")
-  system("sudo ip addr del #{data[:ip]} dev eth0")
-end
 menu
-display_network_information
