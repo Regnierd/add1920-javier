@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+
+require 'telegram/bot'
+
+# token:
+# 1. Write your TOKEN value into "token" variable or
+# 2. Create a local file "hiden.token" with your TOKEN value inside
+token = `cat /etc/bot13/token`.strip
+bot_username = '@bot_javier'
+
+puts "[INFO] Running bot #{$0}..."
+
+Telegram::Bot::Client.run(token) do |bot|
+  bot.listen do |message|
+    options = message.text.split(" ")
+    if options[0] == "/startservice"
+      system("systemctl start #{options[1]}")
+      if options[1] == nil
+        bot.api.send_message(chat_id: message.chat.id, text:
+"Introduce un servicio. 
+Para mas ayuda usa /help.")
+      else
+        bot.api.send_message(chat_id: message.chat.id, text: "Servicio #{options[1]} iniciado")
+      end
+    elsif options[0] == "/statuservice"
+     status_services = system("systemctl status #{options[1]} > /dev/null")
+      if options[1] == nil
+        bot.api.send_message(chat_id: message.chat.id, text: 
+"Introduce un servicio.
+Para mas ayuda usa /help.")
+      elsif status_services
+        bot.api.send_message(chat_id: message.chat.id, text: "El estado de #{options[1]} esta activo")
+      else
+        bot.api.send_message(chat_id: message.chat.id, text: "El estado de #{options[1]} esta inactivo")
+      end
+    elsif options[0] == "/stopservice"
+      system("systemctl stop #{options[1]}")
+      if options[1] == nil
+        bot.api.send_message(chat_id: message.chat.id, text:
+"Introduce un servicio.
+Para mas ayuda usa /help.")
+      else
+        bot.api.send_message(chat_id: message.chat.id, text: "Servicio #{options[1]} apagado")
+      end
+    elsif message.text == "/hello"
+      bot.api.send_message(chat_id: message.chat.id, text: "Hello Word!")
+    elsif message.text == "/byebye"
+      bot.api.send_message(chat_id: message.chat.id, text: "Bye bye!")
+    elsif message.text == "/ip"
+      show_ip = `ip a | grep 'inet ' | grep -v 'host lo'`.split
+      bot.api.send_message(chat_id: message.chat.id, text: "Tu IP es: #{show_ip[1]}")
+    elsif message.text == "/help"
+      show_help = "Los comandos que puedes hacer son:
+        /hello: te saludará.
+        /byebye: se despedirá.
+        /ip: te mostrará la ip de la máquina.
+        /statuservice <nombre_servicio>: te indicará el estado del servicio que le pase.
+        /startservice <nombre_servicio>: iniciará el servicio que le pase.
+	/stopservice <nombre_servicio>: parará el servicio que le pase.
+        /help: te mostrará la información que puedes usar"
+        bot.api.send_message(chat_id: message.chat.id, text: "Ayuda: #{show_help}")
+    end
+  end
+end
